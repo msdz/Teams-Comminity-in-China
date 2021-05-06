@@ -1,0 +1,63 @@
+# This workflow will build and push a node.js application to an Azure Web App when a release is created.
+#
+# This workflow assumes you have already created the target Azure App Service web app.
+# For instructions see https://docs.microsoft.com/azure/app-service/app-service-plan-manage#create-an-app-service-plan
+#
+# To configure this workflow:
+#
+# 1. For Linux apps, add an app setting called WEBSITE_WEBDEPLOY_USE_SCM and set it to true in your app **before downloading the file**.
+#      For more instructions see: https://docs.microsoft.com/azure/app-service/configure-common#configure-app-settings
+#
+# 2. Set up a secret in your repository named AZURE_WEBAPP_PUBLISH_PROFILE with the value of your Azure publish profile.
+#    For instructions on obtaining the publish profile see: https://docs.microsoft.com/azure/app-service/deploy-github-actions#configure-the-github-secret
+#
+# 3. Change the values for the AZURE_WEBAPP_NAME, AZURE_WEBAPP_PACKAGE_PATH and NODE_VERSION environment variables  (below).
+#
+# For more information on GitHub Actions for Azure, refer to https://github.com/Azure/Actions
+# For more samples to get started with GitHub Action workflows to deploy to Azure, refer to https://github.com/Azure/actions-workflow-samples
+name: Azure Static Web Apps CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  release:
+    types: [created]
+
+env:
+  AZURE_WEBAPP_NAME: your-app-name    # set this to your application's name
+  AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
+  NODE_VERSION: '10.x'                # set this to the node version to use
+
+jobs:
+  build_and_deploy_job:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    name: Build and Deploy Job
+    runs-on: ubuntu-latest    
+    environment: production
+    steps:
+    - uses: actions/checkout@v2
+      with:
+          submodules: true
+    - name: 'Build And Deploy Azure Static Web Apps'
+      uses: Azure/static-web-apps-deploy@v0.0.1-preview
+      with:
+        azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_MANGO_RIVER_0AFDB141E }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for GitHub integrations (i.e. PR comments)
+        action: 'upload'
+        # Directory location of the application source code # App source code path
+        app_location: '/Sites'
+        # Required token
+        azure_static_web_apps_api_token: '4eb65cb47d3bd61804a22a409c26c0c57a6140f95d05b750fcb19b3d355b01a2-aa51ae3a-3c6c-4ae7-8202-87fb671a79df0007924'
+        # Custom command for Oryx to run when building Azure Functions source code
+        api_build_command: # optional
+        # Directory location of the Azure Functions source code
+        api_location: # optional
+        # Directory location of the compiled application code after building
+        app_artifact_location: # optional
+        # Custom command for Oryx to run when building application source code
+        app_build_command: # optional
+        # Token for interacting with the Github repository. Currently used only for commenting on Pull Requests.
+        repo_token: # optional
+        # Directory location where the routes.json file can be found in the source code
+        routes_location: # optional
